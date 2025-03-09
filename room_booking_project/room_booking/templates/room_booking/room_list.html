@@ -1,0 +1,210 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Available Rooms</title>
+    {% load static %}
+    <script
+        src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/moment@2.29.4/moment.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.1/chart.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="{% static 'room_booking/assets/' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'room_booking/css/room_list.css' %}">
+
+</head>
+
+<body>
+    <header>
+    </header>
+    <div>
+        <nav class="navbar">
+            <div class="navbar-left">
+                <a href="{% url 'room_list' %}" class="navbar-item">BookingRooms</a>
+            </div>
+            <div class="navbar-right">
+                {% if user.is_authenticated %}
+
+                <a href="{% url 'user_profile' user.id %}" class="login-btn">{{ user.username }}</a>
+                <a href="{% url 'logout' %}" class="sign-up-btn">Logout</a>
+
+                {% else %}
+                
+                <a href="{% url 'login' %}" class="login-btn">Login</a>
+                <a href="{% url 'signup' %}" class="sign-up-btn">Sign Up</a>
+
+                {% endif %}
+            </div>
+        </nav>
+        <main>
+            <!-- <section class="hero">
+                <h1>New generation of booking</h1>
+                <p>Booking tax-free from Chis. platform</p>
+                <img src="{% static 'room_booking/assets/image/mesh-640.png' %}" alt="">
+                <a href="#" class="button">Keep calm & travel on</a>
+            </section> -->
+            <section class="hero">
+                <img src="{% static 'room_booking/assets/image/xxx.jpeg' %}" alt="Background"
+                    class="hero-background">
+                <div class="hero-content">
+                    <h1>Booking Rooms</h1>
+                    <p>Booking for Rest</p>
+                    <a href="#target-section" class="button" id="scrollButton">Let's Booking</a>
+                </div>
+            </section>
+            <section id="target-section">
+                <div class="card-container">
+                    {% for room in rooms %}
+                    <a href="{% url 'book_room' room.id %}" class="card-link">
+                        <div class="card">
+                            <div class="card-header">
+                                <img src="{{ room.image.url }}" alt="Room image"
+                                    class="card-image">
+                            </div>
+                            <div class="card-body">
+                                <h3 class="card-title">{{ room.name }}</h3>
+                                <div class="card-info">
+                                    <!-- Icons and info here -->
+                                    <div>{{ room.beds }} beds</div>
+                                    <div>{{ room.baths }} baths</div>
+                                    <div>{{ room.size }} Sq. Ft</div>
+                                </div>
+
+                                <div class="card-price">฿ {{ room.price }}</div>
+                            </div>
+                        </div>
+                    </a>
+                    {% endfor %}
+                </div>
+            </section>
+        </main>
+        <aside>
+        </aside>
+        <footer>
+        </footer>
+    
+        
+    </div>
+
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/chart.js/dist/chart.umd.min.js"></script>
+    <script
+        src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+    <script src="{% static 'room_booking/js/room_list.js' %}"></script>
+
+    
+    
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    
+    <div class="plotly-container">
+        <h3 class="main--title">Price vs Room Size</h3>
+        <div id="price-size-chart"></div>
+    </div>
+    
+    <div class="plotly-container">
+        <h3 class="main--title">Review Count vs Rating</h3>
+        <div id="review-rating-chart"></div>
+    </div>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            fetch("{% url 'room_booking_chart_data' %}") // ใช้ Django API ที่จะสร้างด้านล่าง
+                .then(response => response.json())
+                .then(data => {
+                    // 📊 กราฟที่ 1: เปรียบเทียบราคาและขนาดห้องพัก
+                    var trace1 = {
+                        x: data.sizes,
+                        y: data.prices,
+                        type: 'bar',
+                        marker: { color: 'blue' },
+                        name: 'Price'
+                    };
+    
+                    var layout1 = {
+                        title: 'Room Price vs Size',
+                        xaxis: { title: 'Room Size (sq ft)' },
+                        yaxis: { title: 'Price (THB)' }
+                    };
+    
+                    Plotly.newPlot('price-size-chart', [trace1], layout1);
+    
+                    // 📊 กราฟที่ 2: เปรียบเทียบจำนวนรีวิวกับคะแนนรีวิว
+                    var trace2 = {
+                        x: data.reviews_count,
+                        y: data.ratings,
+                        mode: 'markers',
+                        type: 'scatter',
+                        marker: { size: 10, color: 'red' },
+                        name: 'Reviews'
+                    };
+    
+                    var layout2 = {
+                        title: 'Review Count vs Rating',
+                        xaxis: { title: 'Number of Reviews' },
+                        yaxis: { title: 'Rating' }
+                    };
+    
+                    Plotly.newPlot('review-rating-chart', [trace2], layout2);
+                })
+                .catch(error => console.error('Error loading chart:', error));
+        });
+    </script>
+    
+    </script>
+    <div class="plotly-container">
+        <h3 class="main--title">Room Price Distribution</h3>
+        <div id="price-distribution-chart"></div>
+    </div>
+    
+    
+    <div class="plotly-container">
+        <h3 class="main--title">Top 10 Most Expensive Rooms</h3>
+        <div id="top-expensive-rooms-chart"></div>
+    </div>
+    
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+    fetch("{% url 'room_booking_chart_data' %}") // URL API Django
+        .then(response => response.json())
+        .then(data => {
+            // 📊 กราฟ 1: Room Price Distribution
+            var trace1 = {
+                x: data.prices,
+                type: 'histogram',
+                marker: { color: 'blue' },
+            };
+
+            Plotly.newPlot('price-distribution-chart', [trace1], {
+                title: 'Room Price Distribution',
+                xaxis: { title: 'Price (THB)' },
+                yaxis: { title: 'Count' }
+            });
+
+
+            // 📊 กราฟ 3: Top 10 Most Expensive Rooms
+            var trace3 = {
+                x: data.name,
+                y: data.prices,
+                type: 'bar',
+                marker: { color: 'green' },
+            };
+
+            Plotly.newPlot('top-expensive-rooms-chart', [trace3], {
+                title: 'Top 10 Most Expensive Rooms',
+                xaxis: { title: 'Room Name' },
+                yaxis: { title: 'Price (THB)' }
+            });
+
+        
+        })
+        .catch(error => console.error('Error loading chart:', error));
+});
+
+    </script>
+    
+
+</body>
+
+
+</html>

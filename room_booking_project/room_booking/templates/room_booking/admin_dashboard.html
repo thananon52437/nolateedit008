@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Admin</title>
+    <!-- Font Awesome Cdn Link -->
+    <script src="https://kit.fontawesome.com/4a55d93132.js" crossorigin="anonymous"></script>
+    {% load static %}
+    <!-- Include Chart.js once, make sure it's a version compatible with the adapter -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Include the date-fns adapter for Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+    <link rel="stylesheet" type="text/css" href="{% static 'room_booking/css/admin_dashboard.css' %}">
+</head>
+
+<body>
+    <div class="sidebar">
+        <div class="logo"></div>
+        <ul class="menu">
+            <li class="active">
+                <a href="{% url 'admin_dashboard' %}">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'admin_profile' %}">
+                    <i class="fas fa-user"></i>
+                    <span>Profile</span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'admin_statistics' %}">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>Statistics</span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'admin_management' %}">
+                    <i class="fa fa-door-open"></i>
+                    <span>Management</span>
+                </a>
+            </li>
+            <li class="logout">
+                <a href="{% url 'logout' %}">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+    <div class="main--content">
+        <div class="header--wrapper">
+            <div class="header--title">
+                <span>Admin</span>
+                <h2>Dashboard</h2>
+            </div>
+            <div class="user--info">
+                <div class="search--box">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" placeholder="Search">
+                </div>
+            </div>
+        </div>
+
+        <div class="card--container">
+            <h3 class="main--title">Booking Data Summary</h3>
+            <div class="card--wrapper">
+
+                <div class="payment--card">
+                    <div class="card--header">
+                        <div class="amount">
+                            <span class="title">Payment amount</span>
+                            <span class="amount--value">฿500.00</span>
+                        </div>
+                        <i class="fa-solid fa-dollar-sign icon"></i>
+                    </div>
+                    <span class="card-detail">**********</span>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="tabular--wrapper">
+            <h3 class="main--title">Booking Data</h3>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Booking ID</th>
+                            <th>Guest Name</th>
+                            <th>Check-in Date</th>
+                            <th>Check-out Date</th>
+                            <th>Room Name</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                            <th>Slip</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for payment_slip in payment_slips %}
+                        <tr>
+                            <td>{{ payment_slip.booking.booking_id }}</td>
+                            <td>{{ payment_slip.guest_name }}</td>
+                            <td>{{ payment_slip.booking.checkin_date }}</td>
+                            <td>{{ payment_slip.booking.checkout_date }}</td>
+                            <td>{{ payment_slip.room.name }}</td>
+                            <td>{{ payment_slip.room.price }}</td>
+                            <td><a href="{{ payment_slip.slip.url }}">View Slip</a></td>
+                            <td>{{ payment_slip.verified }}</td>
+                            <td>
+                                <form action="{% url 'verify_payment_slip' payment_slip.id %}" method="post">
+                                    {% csrf_token %}
+                                    <button type="submit">Verify</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/chart.js/dist/chart.umd.min.js"></script>
+    <script
+        src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="{% static 'room_booking/js/admin_dashboard.js' %}"></script>
+</body>
+
+</html>
